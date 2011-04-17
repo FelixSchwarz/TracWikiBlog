@@ -38,11 +38,33 @@ from trac.util.datefmt import utc
 from trac.test import Mock, EnvironmentStub, MockPerm
 from trac.web.href import Href
 from trac.wiki.model import WikiPage
+from tractags.api import TagSystem
 
 from trac_wiki_blog.lib.pythonic_testcase import *
-from trac_wiki_blog.util import creation_date_of_page, create_tagged_page, \
-    create_tagged_pages, load_pages_with_tags, sort_by_creation_date, \
-    paginate_page_list
+from trac_wiki_blog.util import creation_date_of_page, load_pages_with_tags, \
+    sort_by_creation_date, paginate_page_list
+
+
+def create_tagged_pages(env, req, tags, number_of_pages):
+    long_ago = datetime.datetime(year=2000, month=1, day=1, tzinfo=utc)
+    one_day = datetime.timedelta(days=1)
+    pagelist = []
+    for i in range(number_of_pages):
+        name = 'page ' + str(i)
+        text = 'pagetext ' + str(i)
+        page = create_tagged_page(env, req, name, text, tags)
+        long_ago += one_day
+        page.save('author', 'comment', 'remote', long_ago)
+        page = WikiPage(env, name, None)
+        pagelist.append(page)
+    return pagelist
+
+def create_tagged_page(env, req, name, text, tags):
+    page = WikiPage(env, name, None)
+    page.text = text
+    tag_system = TagSystem(env)
+    tag_system.add_tags(req, page.resource, tags)
+    return page
 
 
 class PostFinderTest(unittest.TestCase):
