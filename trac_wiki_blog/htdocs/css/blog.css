@@ -1,0 +1,16 @@
+
+.blog_heading {
+    margin-bottom:      1em;
+}
+
+.blog_separator_line {
+    margin-bottom:      0px;
+}
+
+.blog_post_creation_time {
+    color:              gray;
+    float:              right;
+    font-size:          85%;
+}
+
+
