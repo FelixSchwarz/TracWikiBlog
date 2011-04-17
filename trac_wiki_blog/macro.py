@@ -34,7 +34,7 @@ from pkg_resources import resource_filename
 from trac.core import implements
 from trac.util.datefmt import format_datetime, pretty_timedelta, to_datetime
 from trac.util.translation import _
-from trac.web.chrome import Chrome, add_stylesheet
+from trac.web.chrome import add_stylesheet, Chrome, ITemplateProvider
 from trac.wiki.formatter import wiki_to_html
 from trac.wiki.macros import WikiMacroBase
 
@@ -74,7 +74,7 @@ class ShowPostsMacro(WikiMacroBase):
         )
         return self._render_template(req, 'show_posts_macro.html', parameters)
     
-    def _process_page(req, page):
+    def _process_page(self, req, page):
         post_content = content_from_wiki_markup(page.text)
         creation_date = creation_date_of_page(page)
         return dict(
