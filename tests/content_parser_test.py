@@ -31,6 +31,7 @@
 
 import unittest
 
+from trac_wiki_blog.lib.pythonic_testcase import *
 from trac_wiki_blog.util import content_from_wiki_markup, title_from_wiki_markup
 
 
@@ -40,30 +41,31 @@ class ContentParser(unittest.TestCase):
     # Title parsing
     
     def test_throws_error_if_no_title_is_present(self):
-        self.assertRaises(ValueError, title_from_wiki_markup, "")
+        assert_raises(ValueError, lambda: title_from_wiki_markup(""))
     
     def test_can_parse_simple_title(self):
-        self.assertEquals("bla", title_from_wiki_markup("= bla ="))
+        assert_equals("bla", title_from_wiki_markup("= bla ="))
     
     def test_can_parse_title_with_spaces_before_it(self):
-        self.assertEquals("bla", title_from_wiki_markup(" = bla ="))
+        assert_equals("bla", title_from_wiki_markup(" = bla ="))
     
     def test_throws_if_title_is_missing_spaces_after_equal_signs(self):
-        self.assertRaises(ValueError, title_from_wiki_markup, "=bla=")
+        assert_raises(ValueError, lambda: title_from_wiki_markup("=bla="))
     
     def test_can_ignore_stuff_before_first_title(self):
-        self.assertEquals("bla", title_from_wiki_markup("[[Image(wiki:2007/02/09/17.55:Xaos_Screenshot.jpg, right, 400)]]\n= bla ="))
+        assert_equals("bla", title_from_wiki_markup("[[Image(wiki:2007/02/09/17.55:Xaos_Screenshot.jpg, right, 400)]]\n= bla ="))
     
     def test_can_parse_shell_scripts_in_title(self):
-        self.assertEquals('if [ "z$?" != "z0" ] ; then ...', title_from_wiki_markup('= if [ "z$?" != "z0" ] ; then ... = Aus dem Buildscript '))
+        assert_equals('if [ "z$?" != "z0" ] ; then ...', title_from_wiki_markup('= if [ "z$?" != "z0" ] ; then ... = Aus dem Buildscript '))
     
     # ================================================================
     # Content parsing
     
     def test_can_extract_simple_content(self):
-        self.assertEquals("bla", content_from_wiki_markup("= blub = bla"))
+        assert_equals("bla", content_from_wiki_markup("= blub = bla"))
     
     def test_can_extract_multiline_content(self):
-        self.assertEquals("bla\nblub", content_from_wiki_markup("= blub = bla\nblub"))
+        assert_equals("bla\nblub", content_from_wiki_markup("= blub = bla\nblub"))
     
 # TODO: consider changing parsing to really "extract" the title, and leave everything before and after it as the content
+
