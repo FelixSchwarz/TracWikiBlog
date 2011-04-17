@@ -1,3 +1,3 @@
 
-from trac_wiki_blog.util import *
+from trac_wiki_blog.macro import *
 
