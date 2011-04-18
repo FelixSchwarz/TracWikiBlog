@@ -51,12 +51,19 @@ def now():
 
 
 class ShowPostsMacro(WikiMacroBase):
-    """Provide a list of tagged blog posts, sorted by creation time."""
+    """Macro to display a list of tagged blog posts, sorted by creation time.
+    
+    Example:
+       ![[ShowPosts(title=Blog Posts)]]
+    
+    The macro gets an optional parameter "title" so you can customize the title
+    above the list of blog posts.
+    """
     
     implements(ITemplateProvider)
     
     # WikiMacroBase
-    def expand_macro(self, formatter, name, content):
+    def expand_macro(self, formatter, macro_name, argument_string):
         req = formatter.req
         pages = sort_by_creation_date(load_pages_with_tags(self.env, req, "blog"))
         
@@ -68,11 +75,17 @@ class ShowPostsMacro(WikiMacroBase):
         
         add_stylesheet(req, 'blog/css/blog.css')
         parameters = dict(
-            blog_heading = _("Blog Posts"),
+            blog_heading = _(self._title(argument_string)),
             read_post_title = _("Read Post"),
             pages = processed_pages
         )
         return self._render_template(req, 'show_posts_macro.html', parameters)
+    
+    def _title(self, argument_string):
+        if argument_string in (None, ''):
+            return u'Blog Posts'
+        assert argument_string.startswith('title=')
+        return argument_string.split('title=', 1)[1].strip()
     
     def _process_page(self, req, page):
         post_content = content_from_wiki_markup(page.text)
