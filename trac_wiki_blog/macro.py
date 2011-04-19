@@ -91,11 +91,7 @@ class ShowPostsMacro(WikiMacroBase):
         return argument_string.split('title=', 1)[1].strip()
     
     def _blogpost_to_html(self, req, page):
-        print 'page.resource', page.resource
-        print 'req.href', repr(req.href.base), req.href._derived
-        print 'req.perm', req.perm
-        from trac.test import MockPerm
-        context = Context(page.resource, href=req.href, perm=MockPerm())
+        context = Context(page.resource, href=req.href, perm=req.perm)
         # HtmlFormatter relies on the .req even though that's not always present
         # in a Context. Seems like a known dark spot in Trac's API. Check 
         # comments in trac.mimeview.api.Context.__call__()
