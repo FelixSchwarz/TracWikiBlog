@@ -103,15 +103,18 @@ class PostFinderTest(unittest.TestCase):
         assert_not_equals(long_ago, page.time)
         assert_equals(long_ago, creation_date_of_page(page))
     
+    def resource_ids(self, list_of_objects):
+        return [item.resource for item in list_of_objects]
+    
     def test_can_sort_page_list(self):
         pagelist = create_tagged_pages(self.env, self.req, ["fnord"], 4)
         pagelist.reverse()
         sorted_list = pagelist[:]
-        assert_equals(sorted_list, pagelist)
+        assert_equals(self.resource_ids(sorted_list), self.resource_ids(pagelist))
         random.shuffle(pagelist)
-        assert_not_equals(sorted_list, pagelist)
+        assert_not_equals(self.resource_ids(sorted_list), self.resource_ids(pagelist))
         pagelist = sort_by_creation_date(pagelist)
-        assert_equals(sorted_list, pagelist)
+        assert_equals(self.resource_ids(sorted_list), self.resource_ids(pagelist))
     
     def test_can_get_paginated_page_list(self):
         page_list = create_tagged_pages(self.env, self.req, ["fnord"], 4)

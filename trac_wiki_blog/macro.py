@@ -32,11 +32,14 @@
 from pkg_resources import resource_filename
 
 from trac.core import implements
+from trac.mimeview.api import Context
+from trac.resource import Resource
 from trac.util.datefmt import format_datetime, pretty_timedelta, to_datetime
 from trac.util.translation import _
 from trac.web.chrome import add_stylesheet, Chrome, ITemplateProvider
-from trac.wiki.formatter import wiki_to_html
+from trac.wiki.formatter import HtmlFormatter
 from trac.wiki.macros import WikiMacroBase
+
 
 from trac_wiki_blog.util import content_from_wiki_markup, \
     creation_date_of_page, get_wiki_pagename, load_pages_with_tags, \
@@ -87,16 +90,28 @@ class ShowPostsMacro(WikiMacroBase):
         assert argument_string.startswith('title=')
         return argument_string.split('title=', 1)[1].strip()
     
+    def _blogpost_to_html(self, req, page):
+        print 'page.resource', page.resource
+        print 'req.href', repr(req.href.base), req.href._derived
+        print 'req.perm', req.perm
+        from trac.test import MockPerm
+        context = Context(page.resource, href=req.href, perm=MockPerm())
+        # HtmlFormatter relies on the .req even though that's not always present
+        # in a Context. Seems like a known dark spot in Trac's API. Check 
+        # comments in trac.mimeview.api.Context.__call__()
+        context.req = req
+        return HtmlFormatter(self.env, context, page.text).generate()
+    
     def _process_page(self, req, page):
         post_content = content_from_wiki_markup(page.text)
         creation_date = creation_date_of_page(page)
+        
         return dict(
             title = title_from_wiki_markup(page.text),
             url = req.href.wiki(page.name),
             creation_date = format_datetime(creation_date),
             delta = pretty_timedelta(creation_date, now()),
-            # TODO: Need to build custom req so relative links are correct
-            content = wiki_to_html(post_content, self.env, req),
+            content=self._blogpost_to_html(req, page),
         )
     
     def _render_template(self, req, template, attributes):
