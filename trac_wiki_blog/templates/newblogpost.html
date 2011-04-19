@@ -1,0 +1,45 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      py:strip="">
+	
+	<!--! Fix Header -->
+	<h1 py:match="div[@id='content'][@class='wiki']//h1">
+		Create New Blog Post
+	</h1>
+	
+	<title py:match="title">
+		Create New Blog Post
+	</title>
+	
+	<!--! Add a field for the blog-heading (also used to generate the pagename) -->
+	<py:match path="fieldset[@class='iefix']" once="true">
+	  <fieldset py:attrs="select('@*')">
+		<div class="field">
+			<label>
+			Entry Title<br />
+			<input id="comment" type="text" name="blogtitle" size="60" value="${blog.title}" />
+			</label>
+		</div>
+		<br />
+		${select('*')}
+      </fieldset>
+	</py:match>
+
+	<!--! Get rid of comment field -->
+	<py:match path="div[@id='changeinfo1']/div[@class='field']" >
+		<py:if test="not select('*/input[@id=\'comment\']').render()">
+			${select('.')}
+		</py:if>
+	</py:match>
+	
+	<!--! TODO: consider adding wiki-page-name field so it can be controlled when wished (optional would be cool) -->
+	
+	<form py:match="form[@id='edit']" py:attrs="select('@*')">
+        ${select('*')}
+	</form>
+	
+	<!-- Work all this magic on the main wiki editing template -->
+	<xi:include href="wiki_edit.html" />
+</html>
+
