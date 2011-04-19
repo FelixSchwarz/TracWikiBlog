@@ -35,7 +35,7 @@
 	
 	<!--! TODO: consider adding wiki-page-name field so it can be controlled when wished (optional would be cool) -->
 	
-	<form py:match="form[@id='edit']" py:attrs="select('@*')">
+	<form py:match="form[@id='edit']" id="edit" method="post" action="">
         ${select('*')}
 	</form>
 	

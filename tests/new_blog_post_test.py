@@ -84,8 +84,14 @@ class NewBlogPostTest(TracTest):
         wiki_content = soup.find(name='div', attrs={'id': 'content', 'class': 'wiki'})
         title_fields = wiki_content.findAll(name='input', attrs={'name': 'blogtitle'})
         assert_length(1, title_fields)
+    
+    def test_sends_form_submission_to_the_same_url_as_the_initial_request(self):
+        self.grant_permission('anonymous', 'TRAC_ADMIN')
+        soup = self._get_newblogpost_dom()
+        form = soup.find(name='form', attrs={'id': 'edit', 'method': 'post'})
+        assert_equals('', form['action'])
+        
 
 # TODO: Check: Tag interface
-# TODO: Check form URL
 # TODO: Check that the newblogpost page is only accessible for WIKI_MODIFY+TAGS_MODIFY
 
