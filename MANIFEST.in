@@ -1,0 +1,3 @@
+include COPYING.txt
+recursive-include trac_wiki_blog/htdocs/ *
+recursive-include trac_wiki_blog/templates/ *

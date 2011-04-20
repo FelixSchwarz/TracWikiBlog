@@ -27,6 +27,7 @@ if __name__ == '__main__':
         # uses simple_super
         zip_safe=False,
         packages=setuptools.find_packages(exclude=['tests']),
+        include_package_data=True,
         classifiers = [
             'Development Status :: 4 - Beta',
             'Intended Audience :: Developers',
