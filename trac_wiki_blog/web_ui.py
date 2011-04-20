@@ -56,8 +56,6 @@ class NewPostModule(WikiModule):
     # TODO: add more escapes to the wiki page name
     # TODO: limit blog post user friendly name length
     
-    implements(IRequestHandler, ITemplateProvider) #, IPermissionRequestor)
-    
     # Implementation IRequestHandler
     def match_request(self, req):
         return req.path_info == '/newblogpost'
@@ -135,6 +133,10 @@ class NewPostModule(WikiModule):
         return []
     
     def get_timeline_events(self, req, start, stop, filters):
+        return []
+    
+    # IPermissionRequestor methods
+    def get_permission_actions(self):
         return []
 
 
