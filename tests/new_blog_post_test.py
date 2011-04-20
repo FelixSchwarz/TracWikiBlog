@@ -27,6 +27,7 @@ import unittest
 from BeautifulSoup import BeautifulSoup
 from trac.attachment import Attachment
 from trac.test import EnvironmentStub, Mock
+from trac.versioncontrol.api import RepositoryManager
 from trac.wiki.model import WikiPage
 
 from trac_wiki_blog.lib.pythonic_testcase import *
@@ -98,14 +99,67 @@ class NewBlogPostTest(TracTest):
         # TODO: Posting without version -> 500 in Trac
         req = self.post_request('/newblogpost', action='edit', save='Submit changes', blogtitle='title', text='some post', tags='blog', version=0)
         response = self.simulate_request(req)
-        print response.html()
         assert_equals(303, response.code())
         
         page = WikiPage(self.env, '2011/04/title')
         assert_true(page.exists)
         assert_equals('= title =\n\nsome post', page.text)
+    
+    # --------------------------------------------------------------------------
+    # nav item
+    
+    def _newpost_link(self, path='/about'):
+        # necessary so the /about path works. That's a good path because every 
+        # user can access the page.
+        import trac.about
+        response = self.simulate_request(self.get_request(path))
+        soup = BeautifulSoup(response.html())
+        newpost_link = soup.find('a', attrs={'href': '/newblogpost'})
+        return newpost_link
+    
+    def assert_newpost_link_is_displayed(self):
+        newpost_link = self._newpost_link()
+        assert_not_none(newpost_link)
+        return newpost_link
+    
+    def assert_newpost_link_is_not_displayed(self):
+        newpost_link = self._newpost_link()
+        assert_none(newpost_link)
+    
+    def test_shows_link_to_new_blog_post_page_in_nav_bar(self):
+        self.grant_permission('anonymous', 'TRAC_ADMIN')
+        
+        newpost_link = self.assert_newpost_link_is_displayed()
+        assert_equals('New Blog Post', newpost_link.text)
+    
+    def test_shows_highlighted_link_when_on_the_newblogpost_page(self):
+        self.grant_permission('anonymous', 'TRAC_ADMIN')
+        # if there are any warnings because of a non-existing repository, Trac
+        # will not highlight any navigation item
+        self.disable_component(RepositoryManager)
+        
+        newpost_link = self._newpost_link('/newblogpost')
+        nav_item = newpost_link.parent
+        assert_equals('active', nav_item.get('class'))
+    
+    def test_only_show_newblogpost_link_if_user_has_enough_permissions(self):
+        self.assert_has_permission('anonymous', 'WIKI_VIEW')
+        
+        self.grant_permission('anonymous', 'TAGS_MODIFY')
+        self.assert_has_permission('anonymous', 'TAGS_MODIFY')
+        self.assert_has_no_permission('anonymous', 'WIKI_CREATE')
+        self.assert_newpost_link_is_not_displayed()
 
+        self.revoke_permission('anonymous', 'TAGS_MODIFY')
+        self.grant_permission('anonymous', 'WIKI_CREATE')
+        self.assert_has_no_permission('anonymous', 'TAGS_MODIFY')
+        self.assert_has_permission('anonymous', 'WIKI_CREATE')
+        self.assert_newpost_link_is_not_displayed()
 
+        self.grant_permission('anonymous', 'TAGS_MODIFY')
+        self.assert_has_permission('anonymous', 'TAGS_MODIFY')
+        self.assert_has_permission('anonymous', 'WIKI_CREATE')
+        self.assert_newpost_link_is_displayed()
 
 #class TestNewBlogPostWithPreview(FunctionalTwillTestCaseSetup):
 # check that preview page is visible

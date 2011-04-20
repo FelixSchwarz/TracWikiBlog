@@ -36,7 +36,7 @@
 
 
 __all__ = ['assert_contains', 'assert_equals', 'assert_false', 'assert_length',
-           'assert_none', 'assert_not_equals', 
+           'assert_none', 'assert_not_none', 'assert_not_equals', 
            'assert_raises', 'assert_true', ]
 
 

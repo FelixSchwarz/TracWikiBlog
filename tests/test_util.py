@@ -69,6 +69,13 @@ class TracTest(TestCase):
             assert_true(self.env.is_component_enabled(component), 
                         '%s is not enabled' % component_name)
     
+    def revoke_permission(self, username, action):
+        # DefaultPermissionPolicy will cache permissions for 5 seconds so we 
+        # need to reset the cache
+        DefaultPermissionPolicy(self.env).permission_cache = {}
+        PermissionSystem(self.env).revoke_permission(username, action)
+        assert_false(self.has_permission(username, action))
+    
     def grant_permission(self, username, action):
         # DefaultPermissionPolicy will cache permissions for 5 seconds so we 
         # need to reset the cache

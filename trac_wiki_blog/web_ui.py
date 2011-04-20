@@ -32,10 +32,12 @@
 import datetime
 import re
 
+from genshi.builder import tag
 from pkg_resources import resource_filename
 from trac.core import implements
+from trac.util.translation import _
 from trac.web import IRequestHandler
-from trac.web.chrome import ITemplateProvider
+from trac.web.chrome import INavigationContributor, ITemplateProvider
 from trac.wiki.web_ui import WikiModule
 from tractags.api import TagSystem
 from tractags.wiki import WikiTagInterface
@@ -52,6 +54,9 @@ _tag_split = re.compile('[,\s]+')
 
 class NewPostModule(WikiModule):
     """Provides a convenient form to enter a new blog-post."""
+    
+    implements(INavigationContributor)
+    
     # TODO: add precautions so two posts at the day with the same name don't overwrite
     # TODO: add more escapes to the wiki page name
     # TODO: limit blog post user friendly name length
@@ -138,6 +143,15 @@ class NewPostModule(WikiModule):
     # IPermissionRequestor methods
     def get_permission_actions(self):
         return []
+    
+    # INavigationContributor
+    def get_active_navigation_item(self, req):
+        return 'blog'
+    
+    def get_navigation_items(self, req):
+        if ('WIKI_CREATE' not in req.perm) or ('TAGS_MODIFY' not in req.perm):
+            return
+        yield ('mainnav', 'blog', tag.a(_('New Blog Post'), href=req.href.newblogpost()))
 
 
 
