@@ -37,9 +37,10 @@ from trac.core import implements
 from trac.web import IRequestHandler
 from trac.web.chrome import ITemplateProvider
 from trac.wiki.web_ui import WikiModule
-
 from tractags.api import TagSystem
 from tractags.wiki import WikiTagInterface
+
+from trac_wiki_blog.util import get_wiki_pagename
 
 
 

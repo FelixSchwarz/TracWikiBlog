@@ -91,7 +91,30 @@ class NewBlogPostTest(TracTest):
         form = soup.find(name='form', attrs={'id': 'edit', 'method': 'post'})
         assert_equals('', form['action'])
         
+    # TODO: Check: Tag interface
+    # TODO: Check that the newblogpost page is only accessible for WIKI_MODIFY+TAGS_MODIFY
+    # --------------------------------------------------------------------------
+    # creating a new post
+    
+    def test_can_submit_a_new_blog_post(self):
+        self.grant_permission('anonymous', 'TRAC_ADMIN')
+        # TODO: Posting without version -> 500 in Trac
+        req = self.post_request('/newblogpost', action='edit', save='Submit changes', blogtitle='title', text='some post', tags='blog', version=0)
+        response = self.simulate_request(req)
+        print response.html()
+        assert_equals(303, response.code())
+        
+        page = WikiPage(self.env, '2011/04/title')
+        assert_true(page.exists)
+        assert_equals('= title =\n\nsome post', page.text)
 
-# TODO: Check: Tag interface
-# TODO: Check that the newblogpost page is only accessible for WIKI_MODIFY+TAGS_MODIFY
+
+
+#class TestNewBlogPostWithPreview(FunctionalTwillTestCaseSetup):
+# check that preview page is visible
+# check that all data is still there (summary, content, tags)
+# check that you can submit the page
+
+# check warning if title is empty
+# check that blog tag is set automatically
 
