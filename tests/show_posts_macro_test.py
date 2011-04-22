@@ -25,6 +25,7 @@
 # Authors:
 #   - Felix Schwarz
 
+import re
 import unittest
 
 from BeautifulSoup import BeautifulSoup
@@ -34,6 +35,8 @@ from trac.wiki.model import WikiPage
 
 from trac_wiki_blog.lib.pythonic_testcase import *
 from trac_wiki_blog.macro import ShowPostsMacro
+
+from post_finder_test import create_tagged_page
 
 # ------------------------------------------------------------------------------
 from cStringIO import StringIO
@@ -253,7 +256,6 @@ class ShowPostsMacroTest(unittest.TestCase):
         from trac.wiki.web_ui import WikiModule
         self._grant_permission('anonymous', 'TRAC_ADMIN')
         
-        from post_finder_test import create_tagged_page
         page = create_tagged_page(self.env, self.req(), 'Foo', '= Foo =\n[attachment:test.txt]', ('blog',))
         page.save(None, None, '127.0.0.1')
         self._add_attachment(page.resource, 'test.txt')
@@ -262,4 +264,19 @@ class ShowPostsMacroTest(unittest.TestCase):
         attachment_link = BeautifulSoup(html).find(name='a', text='test.txt').parent
         assert_equals('attachment', attachment_link['class'])
 
+    # --------------------------------------------------------------------------
+    # Blog Post Titles
+    
+    def test_title_is_only_shown_once(self):
+        self._grant_permission('anonymous', 'TRAC_ADMIN')
+        page = create_tagged_page(self.env, self.req(), 'Foo', '= SomeTitle =\ncontent', ('blog',))
+        page.save(None, None, '127.0.0.1')
+        
+        soup = BeautifulSoup(self._expand_macro())
+        plain_text = ''.join(soup.div(text=True))
+        # looking in plain text (with all tags stripped) as Trac will add the 
+        # title also in the dom node id and an anchor to link to that heading
+        matches = re.findall('SomeTitle', plain_text)
+        assert_length(1, matches)
+        
 

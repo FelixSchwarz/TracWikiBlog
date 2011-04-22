@@ -96,7 +96,7 @@ class ShowPostsMacro(WikiMacroBase):
         # in a Context. Seems like a known dark spot in Trac's API. Check 
         # comments in trac.mimeview.api.Context.__call__()
         context.req = req
-        return HtmlFormatter(self.env, context, page.text).generate()
+        return HtmlFormatter(self.env, context, content_from_wiki_markup(page.text)).generate()
     
     def _process_page(self, req, page):
         post_content = content_from_wiki_markup(page.text)
