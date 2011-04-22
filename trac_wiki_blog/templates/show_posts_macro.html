@@ -3,7 +3,7 @@
     <div py:for="page in pages">
         <hr class="blog_separator_line" />
         <div class="blog_post_creation_time">written ${page.delta} ago ($page.creation_date)</div>
-        <a href="${page.url}">${page.title}</a>
+        ${page.title}
         <div>${Markup(page.content)}</div>
         <div class="blog_post_metadata">
             <a href="${page.url}">$read_post_title</a>

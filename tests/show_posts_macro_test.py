@@ -286,4 +286,16 @@ class ShowPostsMacroTest(unittest.TestCase):
         
         title_link = BeautifulSoup(self._expand_macro()).find('a', href='/wiki/Foo')
         assert_contains('Some <i>italic</i> Title', unicode(title_link))
+    
+    def test_post_title_contains_link_to_blog_post_page(self):
+        self._grant_permission('anonymous', 'TRAC_ADMIN')
+        page = create_tagged_page(self.env, self.req(), 'Foo', "= Some Title =\ncontent", ('blog',))
+        page.save(None, None, '127.0.0.1')
+        
+        html = self._expand_macro()
+        post_heading = BeautifulSoup(html).find('h1', id='SomeTitle')
+        post_link = post_heading.find('a', href='/wiki/Foo')
+        assert_not_none(post_link)
+        assert_equals('Some Title', post_link.text)
+        # Section linking is a JS feature so we can't test it here…
 

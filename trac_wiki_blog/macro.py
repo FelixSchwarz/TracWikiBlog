@@ -29,8 +29,10 @@
 # With ideas and initial code from John Hampton <pacopablo@pacopablo.com> and
 # his TracBlogPlugin (http://trac-hacks.org/wiki/TracBlogPlugin)
 
-from pkg_resources import resource_filename
+import re
 
+from genshi.builder import Markup, tag
+from pkg_resources import resource_filename
 from trac.core import implements
 from trac.mimeview.api import Context
 from trac.resource import Resource
@@ -104,12 +106,31 @@ class ShowPostsMacro(WikiMacroBase):
     def _wikitext_title(self, page):
         return u'= %s =' % title_from_wiki_markup(page.text)
     
+    def _extract_root_tag(self, tag, html):
+        pattern = '(<%(tag)s[^>]*>)(.*)(</%(tag)s>)' % dict(tag=tag)
+        match = re.search(pattern, html)
+        assert match is not None
+        return match.groups()
+    
+    def _blogpost_title_html(self, req, page):
+        title_html = self._wiki_to_html(req, page.resource, self._wikitext_title(page))
+        title_groups = self._extract_root_tag('h1', title_html)
+        
+        link_html = self._wiki_to_html(req, page.resource, '[wiki:"%s"]' % page.resource.id)
+        link_groups = self._extract_root_tag('a', link_html)
+        
+        opening_tags = title_groups[0] + link_groups[0]
+        core_title_html = title_groups[1]
+        closing_tags = link_groups[2] + title_groups[2]
+        final_html = opening_tags + core_title_html + closing_tags
+        return Markup(final_html)
+    
     def _process_page(self, req, page):
         post_content = content_from_wiki_markup(page.text)
         creation_date = creation_date_of_page(page)
         
         return dict(
-            title = self._wiki_to_html(req, page.resource, self._wikitext_title(page)),
+            title = self._blogpost_title_html(req, page),
             url = req.href.wiki(page.name),
             creation_date = format_datetime(creation_date),
             delta = pretty_timedelta(creation_date, now()),
