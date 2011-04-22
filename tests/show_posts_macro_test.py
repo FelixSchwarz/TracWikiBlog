@@ -278,5 +278,12 @@ class ShowPostsMacroTest(unittest.TestCase):
         # title also in the dom node id and an anchor to link to that heading
         matches = re.findall('SomeTitle', plain_text)
         assert_length(1, matches)
+    
+    def test_can_use_wiki_text_in_page_title(self):
+        self._grant_permission('anonymous', 'TRAC_ADMIN')
+        page = create_tagged_page(self.env, self.req(), 'Foo', "= Some ''italic'' Title =\ncontent", ('blog',))
+        page.save(None, None, '127.0.0.1')
         
+        title_link = BeautifulSoup(self._expand_macro()).find('a', href='/wiki/Foo')
+        assert_contains('Some <i>italic</i> Title', unicode(title_link))
 

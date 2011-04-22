@@ -90,20 +90,26 @@ class ShowPostsMacro(WikiMacroBase):
         assert argument_string.startswith('title=')
         return argument_string.split('title=', 1)[1].strip()
     
-    def _blogpost_to_html(self, req, page):
-        context = Context(page.resource, href=req.href, perm=req.perm)
+    def _wiki_to_html(self, req, resource, wikitext):
+        context = Context(resource, href=req.href, perm=req.perm)
         # HtmlFormatter relies on the .req even though that's not always present
         # in a Context. Seems like a known dark spot in Trac's API. Check 
         # comments in trac.mimeview.api.Context.__call__()
         context.req = req
-        return HtmlFormatter(self.env, context, content_from_wiki_markup(page.text)).generate()
+        return HtmlFormatter(self.env, context, wikitext).generate()
+    
+    def _blogpost_to_html(self, req, page):
+        return self._wiki_to_html(req, page.resource, content_from_wiki_markup(page.text))
+    
+    def _wikitext_title(self, page):
+        return u'= %s =' % title_from_wiki_markup(page.text)
     
     def _process_page(self, req, page):
         post_content = content_from_wiki_markup(page.text)
         creation_date = creation_date_of_page(page)
         
         return dict(
-            title = title_from_wiki_markup(page.text),
+            title = self._wiki_to_html(req, page.resource, self._wikitext_title(page)),
             url = req.href.wiki(page.name),
             creation_date = format_datetime(creation_date),
             delta = pretty_timedelta(creation_date, now()),
