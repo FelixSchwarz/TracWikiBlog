@@ -25,10 +25,8 @@
 import unittest
 
 from trac.perm import PermissionSystem
-
-from show_posts_macro_test import EnvironmentStub
-from trac_wiki_blog.lib.pythonic_testcase import *
-from test_util import TracTest
+from trac_dev_platform.test import EnvironmentStub, TracTest
+from trac_dev_platform.test.lib.pythonic_testcase import *
 
 
 class BlogPermissionsTest(TracTest):

@@ -31,7 +31,8 @@
 
 import unittest
 
-from trac_wiki_blog.lib.pythonic_testcase import *
+from trac_dev_platform.test.lib.pythonic_testcase import *
+
 from trac_wiki_blog.util import content_from_wiki_markup, title_from_wiki_markup
 
 

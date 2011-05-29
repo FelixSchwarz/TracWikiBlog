@@ -21,7 +21,7 @@ if __name__ == '__main__':
         license='MIT',
         install_requires=['Trac >= 0.11', 'TracTags>=0.6'],
         
-        tests_require=['nose', 'BeautifulSoup'],
+        tests_require=['TracDevPlatformPlugin', 'nose', 'BeautifulSoup'],
         test_suite = 'nose.collector',
         
         # uses simple_super

@@ -38,10 +38,11 @@ from trac.test import Mock, EnvironmentStub, MockPerm
 from trac.web.href import Href
 from trac.wiki.model import WikiPage
 from tractags.api import TagSystem
+from trac_dev_platform.test.lib.pythonic_testcase import *
 
-from trac_wiki_blog.lib.pythonic_testcase import *
 from trac_wiki_blog.util import creation_date_of_page, load_pages_with_tags, \
     sort_by_creation_date, paginate_page_list
+
 
 
 def create_tagged_pages(env, req, tags, number_of_pages):
