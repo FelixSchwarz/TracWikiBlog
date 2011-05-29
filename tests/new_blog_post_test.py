@@ -22,6 +22,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from datetime import date
 import unittest
 
 from BeautifulSoup import BeautifulSoup
@@ -100,7 +101,8 @@ class NewBlogPostTest(TracTest):
         response = self.simulate_request(req)
         assert_equals(303, response.code())
         
-        page = WikiPage(self.env, '2011/04/title')
+        today = date.today()
+        page = WikiPage(self.env, '%d/%02d/title' % (today.year, today.month))
         assert_true(page.exists)
         assert_equals('= title =\n\nsome post', page.text)
     
