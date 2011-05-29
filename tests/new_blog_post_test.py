@@ -57,11 +57,11 @@ class NewBlogPostTest(TracTest):
         response = self._get_newblogpost()
         return BeautifulSoup(response.html())
     
-    def _test_has_page_to_create_a_new_blog_post(self):
+    def test_has_page_to_create_a_new_blog_post(self):
         self.grant_permission('anonymous', 'TRAC_ADMIN')
         self._get_newblogpost()
     
-    def _test_has_correct_title(self):
+    def test_has_correct_title(self):
         self.grant_permission('anonymous', 'TRAC_ADMIN')
         
         soup = self._get_newblogpost_dom()
@@ -72,7 +72,7 @@ class NewBlogPostTest(TracTest):
         heading = wiki_content.find('h1')
         assert_equals('Create New Blog Post', heading.text)
     
-    def _test_has_only_one_field_for_blog_title(self):
+    def test_has_only_one_field_for_blog_title(self):
         # This is a test case for the dreaded "item duplication" problem in
         # Genshi 0.5.1 (http://genshi.edgewall.org/ticket/254)
         self.grant_permission('anonymous', 'TRAC_ADMIN')
@@ -82,7 +82,7 @@ class NewBlogPostTest(TracTest):
         title_fields = wiki_content.findAll(name='input', attrs={'name': 'blogtitle'})
         assert_length(1, title_fields)
     
-    def _test_sends_form_submission_to_the_same_url_as_the_initial_request(self):
+    def test_sends_form_submission_to_the_same_url_as_the_initial_request(self):
         self.grant_permission('anonymous', 'TRAC_ADMIN')
         soup = self._get_newblogpost_dom()
         form = soup.find(name='form', attrs={'id': 'edit', 'method': 'post'})
@@ -125,13 +125,13 @@ class NewBlogPostTest(TracTest):
         newpost_link = self._newpost_link()
         assert_none(newpost_link)
     
-    def _test_shows_link_to_new_blog_post_page_in_nav_bar(self):
+    def test_shows_link_to_new_blog_post_page_in_nav_bar(self):
         self.grant_permission('anonymous', 'TRAC_ADMIN')
         
         newpost_link = self.assert_newpost_link_is_displayed()
         assert_equals('New Blog Post', newpost_link.text)
     
-    def _test_shows_highlighted_link_when_on_the_newblogpost_page(self):
+    def test_shows_highlighted_link_when_on_the_newblogpost_page(self):
         self.grant_permission('anonymous', 'TRAC_ADMIN')
         # if there are any warnings because of a non-existing repository, Trac
         # will not highlight any navigation item
@@ -141,7 +141,7 @@ class NewBlogPostTest(TracTest):
         nav_item = newpost_link.parent
         assert_equals('active', nav_item.get('class'))
     
-    def _test_only_show_newblogpost_link_if_user_has_enough_permissions(self):
+    def test_only_show_newblogpost_link_if_user_has_enough_permissions(self):
         self.assert_has_permission('anonymous', 'WIKI_VIEW')
         
         self.grant_permission('anonymous', 'TAGS_MODIFY')
